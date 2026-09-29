@@ -9,6 +9,8 @@ class ThreeSum{
     public static void main(String []args){
         int nums [] ={-1,0,1,2,-1,-4};
         System.out.println(threeSum(nums));
+        System.out.println(threeSum_Better(nums));
+        System.out.println(threeSum_Optimal(nums));
     }
 
     //Brute Force:
@@ -38,12 +40,67 @@ class ThreeSum{
     //Better:
     //O(n^2) O(n)
     // Use Two sum approch , choose two and search for one.
-    private static List<List<Integer>> threeSum(int nums[]){
+    private static List<List<Integer>> threeSum_Better(int nums[]){
         int n = nums.length;
         Set<List<Integer>> result = new HashSet<>();
 
-        for(int i = 0 ;i<n ;i++){
+        for(int i = 0 ;i<n;i++){
+            Set<Integer> seen = new HashSet<>();
+             for(int j = i+1 ; j<n;j++){
+                 long remain = -((long)nums[i]+nums[j]);
+                 if(remain >=Integer.MIN_VALUE && remain <=Integer.MAX_VALUE){
+                     int rem = (int )remain;
+                     if(seen.contains(rem)){
+                         List<Integer> temp = Arrays.asList(nums[i],nums[j],rem);
+                         Collections.sort(temp);
+                         result.add(temp);
+                     }
+                 }
+                 seen.add(nums[j]);
+             }
 
         }
+        return new ArrayList<>(result);
+    }
+
+    //Optimal :
+    //O(nlogn )
+    private static List<List<Integer>> threeSum_Optimal(int nums[]){
+        int n = nums.length;
+        List<List<Integer>> result = new ArrayList<>();
+
+        Arrays.sort(nums);
+        for(int i = 0 ; i<n;i++){
+            if(i>0 &&  nums[i]==nums[i-1]){
+                continue;
+            }
+            //Since it is sorted , no other element after that could give a zero sum.
+            if(nums[i]>0){
+                break;
+            }
+            int left =i+1;
+            int right = n-1;
+            while(left<right){
+              long sum = (long)nums[i]+nums[left]+nums[right];
+              if(sum == 0){
+                  result.add(Arrays.asList(nums[i],nums[left],nums[right]));
+                  left++;
+                  right--;
+                  while(left<right && nums[left]==nums[left-1]){
+                      left++;
+                  }
+                  while(left<right && nums[right]==nums[right+1]){
+                      right--;
+                  }
+              }
+              else if(sum<0){
+                  left++;
+              }
+              else{
+                  right--;
+              }
+            }
+        }
+        return result;
     }
 }
